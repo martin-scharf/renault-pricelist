@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Renault Preislisten-Generator</title>
-    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -14,401 +13,597 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a1a2e;
-            color: #eee;
+            background: #0f0f1a;
+            color: #e0e0e0;
             min-height: 100vh;
-            padding: 2rem;
         }
         
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            text-align: center;
-            margin-bottom: 0.5rem;
-            color: #fff;
-            font-size: 1.8rem;
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-        }
-        
-        .card {
-            background: #16213e;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #0f3460;
-        }
-        
-        .card h2 {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            color: #e94560;
+        /* Navigation */
+        .nav {
+            background: #1a1a2e;
+            padding: 1rem 2rem;
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        
+        .nav h1 {
+            font-size: 1.3rem;
+            color: #fff;
+        }
+        
+        .nav-tabs {
+            display: flex;
             gap: 0.5rem;
         }
         
-        .card h2 .step {
-            background: #e94560;
-            color: #fff;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-        }
-        
-        .drop-zone {
-            border: 2px dashed #0f3460;
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: rgba(15, 52, 96, 0.3);
-        }
-        
-        .drop-zone:hover, .drop-zone.dragover {
-            border-color: #e94560;
-            background: rgba(233, 69, 96, 0.1);
-        }
-        
-        .drop-zone.has-file {
-            border-color: #4ade80;
-            background: rgba(74, 222, 128, 0.1);
-        }
-        
-        .drop-zone input {
-            display: none;
-        }
-        
-        .drop-zone p {
+        .nav-tab {
+            background: transparent;
+            border: 1px solid #3a3a5a;
             color: #888;
-            margin-bottom: 0.5rem;
-        }
-        
-        .drop-zone .filename {
-            color: #4ade80;
-            font-weight: 500;
-            word-break: break-all;
-        }
-        
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-        
-        @media (max-width: 600px) {
-            .row {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .info-box {
-            background: rgba(233, 69, 96, 0.1);
-            border: 1px solid rgba(233, 69, 96, 0.3);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
             font-size: 0.9rem;
+            transition: all 0.2s;
         }
         
-        .info-box strong {
+        .nav-tab:hover {
+            border-color: #e94560;
             color: #e94560;
         }
         
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+        .nav-tab.active {
+            background: #e94560;
+            border-color: #e94560;
+            color: #fff;
         }
         
-        .stat {
-            background: rgba(15, 52, 96, 0.5);
-            padding: 1rem;
-            border-radius: 8px;
+        /* Main Content */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Generator Page */
+        .upload-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 16px;
+            padding: 3rem;
             text-align: center;
+            border: 2px dashed #3a3a5a;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-section:hover, .upload-section.dragover {
+            border-color: #e94560;
+            background: linear-gradient(135deg, #1f1f35 0%, #1a2744 100%);
+        }
+        
+        .upload-section.has-file {
+            border-color: #4ade80;
+            border-style: solid;
+        }
+        
+        .upload-section input {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-section h2 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-section p {
+            color: #666;
+        }
+        
+        .upload-section .filename {
+            color: #4ade80;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .stat-card {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid #2a2a4a;
         }
         
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: bold;
             color: #4ade80;
         }
         
         .stat-label {
-            font-size: 0.8rem;
             color: #888;
+            font-size: 0.85rem;
             margin-top: 0.25rem;
         }
         
-        .output-list {
-            margin-top: 1rem;
+        /* Download Section */
+        .download-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
         
-        .output-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(15, 52, 96, 0.5);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.75rem;
+        @media (max-width: 600px) {
+            .download-section {
+                grid-template-columns: 1fr;
+            }
         }
         
-        .output-info h3 {
-            font-size: 1rem;
+        .download-card {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #2a2a4a;
+        }
+        
+        .download-card h3 {
             color: #fff;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
-        .output-info p {
-            font-size: 0.85rem;
+        .download-card p {
             color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .download-card .badge {
+            background: #e94560;
+            color: #fff;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .download-card .badge.green {
+            background: #4ade80;
+            color: #000;
         }
         
         .btn {
             background: #e94560;
             color: #fff;
             border: none;
-            padding: 0.75rem 1.5rem;
+            padding: 0.9rem 1.5rem;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 500;
+            width: 100%;
             transition: all 0.2s;
         }
         
         .btn:hover {
             background: #d63850;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
         
         .btn:disabled {
-            background: #444;
+            background: #333;
             cursor: not-allowed;
             transform: none;
         }
         
-        .btn-download {
+        .btn-green {
             background: #4ade80;
-            color: #1a1a2e;
+            color: #000;
         }
         
-        .btn-download:hover {
+        .btn-green:hover {
             background: #22c55e;
         }
         
-        .generate-section {
-            text-align: center;
-            padding: 1rem 0;
+        /* Admin Page */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
         }
         
-        .hidden {
-            display: none;
+        .admin-header h2 {
+            color: #fff;
         }
         
-        .preview {
-            margin-top: 1rem;
-            overflow-x: auto;
+        .search-box {
+            background: #1a1a2e;
+            border: 1px solid #3a3a5a;
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            color: #fff;
+            width: 250px;
+            font-size: 0.95rem;
         }
         
-        .preview table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
+        .search-box::placeholder {
+            color: #666;
         }
         
-        .preview th, .preview td {
-            padding: 0.5rem;
-            text-align: left;
-            border-bottom: 1px solid #0f3460;
+        .families-table {
+            background: #1a1a2e;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #2a2a4a;
         }
         
-        .preview th {
-            background: rgba(233, 69, 96, 0.2);
-            color: #e94560;
+        .table-header {
+            display: grid;
+            grid-template-columns: 120px 1fr 150px 150px 100px;
+            padding: 1rem 1.5rem;
+            background: #252540;
             font-weight: 500;
-        }
-        
-        .preview tr:hover td {
-            background: rgba(15, 52, 96, 0.5);
-        }
-        
-        .toggle-preview {
-            background: transparent;
-            border: 1px solid #0f3460;
             color: #888;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
             font-size: 0.85rem;
-            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .toggle-preview:hover {
+        .table-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 150px 150px 100px;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #2a2a4a;
+            align-items: center;
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        .table-row:hover {
+            background: rgba(233, 69, 96, 0.05);
+        }
+        
+        .family-code {
+            font-family: monospace;
+            font-size: 1rem;
+            color: #e94560;
+            font-weight: 600;
+        }
+        
+        .family-desc {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .discount-input {
+            background: #0f0f1a;
+            border: 1px solid #3a3a5a;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            color: #fff;
+            width: 100px;
+            font-size: 0.95rem;
+            text-align: right;
+        }
+        
+        .discount-input:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        
+        .article-count {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid rgba(233, 69, 96, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        .info-box strong {
+            color: #e94560;
+        }
+        
+        /* Actions */
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3a3a5a;
+            color: #888;
+        }
+        
+        .btn-outline:hover {
             border-color: #e94560;
             color: #e94560;
+            background: transparent;
         }
         
-        .error {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            padding: 1rem;
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #4ade80;
+            color: #000;
+            padding: 1rem 1.5rem;
             border-radius: 8px;
-            margin-top: 1rem;
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
         }
         
-        .family-match {
-            font-size: 0.75rem;
-            color: #888;
-            background: rgba(15, 52, 96, 0.5);
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.error {
+            background: #ef4444;
+            color: #fff;
+        }
+        
+        @media (max-width: 900px) {
+            .table-header, .table-row {
+                grid-template-columns: 100px 1fr 120px 120px 80px;
+                font-size: 0.85rem;
+                padding: 0.75rem 1rem;
+            }
+            .discount-input {
+                width: 80px;
+            }
+        }
+
+        /* Scrollable table */
+        .table-body {
+            max-height: 500px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Navigation -->
+    <nav class="nav">
         <h1>Renault Preislisten-Generator</h1>
-        <p class="subtitle">Erstellt Preislisten aus Lieferanten-CSV und Konfiguration</p>
-        
-        <!-- Step 1: Upload Files -->
-        <div class="card">
-            <h2><span class="step">1</span> Dateien hochladen</h2>
-            <div class="row">
-                <div class="drop-zone" id="csvZone">
-                    <input type="file" id="csvInput" accept=".csv">
-                    <p>Lieferanten-CSV hier ablegen</p>
-                    <p style="font-size: 0.85rem; color: #666;">oder klicken zum Auswählen</p>
-                    <p class="filename hidden" id="csvFilename"></p>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPage('generator')">Generator</button>
+            <button class="nav-tab" onclick="showPage('admin')">Rabatte verwalten</button>
+        </div>
+    </nav>
+    
+    <main class="main">
+        <!-- Generator Page -->
+        <div id="generatorPage" class="page active">
+            <div class="upload-section" id="uploadSection">
+                <input type="file" id="fileInput" accept=".csv">
+                <div class="upload-icon">📄</div>
+                <h2>Lieferanten-CSV hochladen</h2>
+                <p>Datei hierher ziehen oder klicken zum Auswählen</p>
+                <p class="filename" id="filename" style="display:none"></p>
+            </div>
+            
+            <div id="resultsSection" style="display:none">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Artikel gesamt</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statMatched">0</div>
+                        <div class="stat-label">Zugeordnet</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statFamilies">0</div>
+                        <div class="stat-label">Produktfamilien</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statValue">0</div>
+                        <div class="stat-label">Listenwert (EUR)</div>
+                    </div>
                 </div>
-                <div class="drop-zone" id="configZone">
-                    <input type="file" id="configInput" accept=".yml,.yaml">
-                    <p>config.yml hier ablegen</p>
-                    <p style="font-size: 0.85rem; color: #666;">oder klicken zum Auswählen</p>
-                    <p class="filename hidden" id="configFilename"></p>
+                
+                <div class="download-section">
+                    <div class="download-card">
+                        <h3>
+                            <span class="badge">Kunde</span>
+                            Preisliste Kunden
+                        </h3>
+                        <p>Enthält: Artikelnummer, Listenpreis, Kundenpreis<br>
+                        Für die Weitergabe an Kunden geeignet.</p>
+                        <button class="btn" onclick="downloadCustomerList()">
+                            Download CSV
+                        </button>
+                    </div>
+                    <div class="download-card">
+                        <h3>
+                            <span class="badge green">CSS</span>
+                            Preisliste Warenwirtschaft
+                        </h3>
+                        <p>Enthält alle Felder inkl. EK-Preise, Rabatte, Beschreibung, Gewicht, DLNR.</p>
+                        <button class="btn btn-green" onclick="downloadFullList()">
+                            Download CSV
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <strong>Hinweis:</strong> Die Preise werden mit den konfigurierten Rabatten aus dem Admin-Bereich berechnet. 
+                    Falls Produktfamilien fehlen, werden sie automatisch erkannt und im Admin-Bereich hinzugefügt.
                 </div>
             </div>
-            <div class="info-box">
-                <strong>CSV-Format:</strong> article;list_price;buying_price;buying_price_self;discount;discount_self;description;weight;DLNR<br>
-                <strong>Config:</strong> YAML mit outputs und families (discountCustomer/discountSelf)
+        </div>
+        
+        <!-- Admin Page -->
+        <div id="adminPage" class="page">
+            <div class="admin-header">
+                <h2>Rabatte nach Produktfamilien</h2>
+                <input type="text" class="search-box" placeholder="Familie suchen..." id="searchInput" oninput="filterFamilies()">
+            </div>
+            
+            <div class="families-table" id="familiesTable">
+                <div class="table-header">
+                    <div>Familie</div>
+                    <div>Beschreibung</div>
+                    <div>VK-Rabatt (%)</div>
+                    <div>EK-Rabatt (%)</div>
+                    <div>Artikel</div>
+                </div>
+                <div class="table-body" id="familiesBody">
+                    <div class="empty-state">
+                        <h3>Noch keine Familien</h3>
+                        <p>Laden Sie zuerst eine CSV-Datei hoch, um die Produktfamilien zu erkennen.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="admin-actions">
+                <button class="btn" onclick="saveFamilies()">Änderungen speichern</button>
+                <button class="btn btn-outline" onclick="exportConfig()">Config exportieren</button>
+                <button class="btn btn-outline" onclick="importConfig()">Config importieren</button>
+                <input type="file" id="configImport" accept=".json" style="display:none" onchange="handleConfigImport(event)">
             </div>
         </div>
-        
-        <!-- Step 2: Preview & Stats -->
-        <div class="card hidden" id="statsCard">
-            <h2><span class="step">2</span> Analyse</h2>
-            <div class="stats" id="stats"></div>
-            <button class="toggle-preview" id="togglePreview">Vorschau anzeigen</button>
-            <div class="preview hidden" id="preview"></div>
-        </div>
-        
-        <!-- Step 3: Generate -->
-        <div class="card hidden" id="generateCard">
-            <h2><span class="step">3</span> Preislisten generieren</h2>
-            <div class="output-list" id="outputList"></div>
-            <div id="errorBox" class="error hidden"></div>
-        </div>
-    </div>
+    </main>
+    
+    <div class="toast" id="toast"></div>
     
     <script>
         // State
-        let csvData = null;
-        let configData = null;
-        let parsedRows = [];
+        let parsedData = [];
+        let families = {};
+        let articlesByFamily = {};
         
-        // DOM Elements
-        const csvZone = document.getElementById('csvZone');
-        const configZone = document.getElementById('configZone');
-        const csvInput = document.getElementById('csvInput');
-        const configInput = document.getElementById('configInput');
-        const csvFilename = document.getElementById('csvFilename');
-        const configFilename = document.getElementById('configFilename');
-        const statsCard = document.getElementById('statsCard');
-        const generateCard = document.getElementById('generateCard');
-        const stats = document.getElementById('stats');
-        const preview = document.getElementById('preview');
-        const outputList = document.getElementById('outputList');
-        const errorBox = document.getElementById('errorBox');
-        
-        // Setup drop zones
-        setupDropZone(csvZone, csvInput, handleCSV);
-        setupDropZone(configZone, configInput, handleConfig);
-        
-        function setupDropZone(zone, input, handler) {
-            zone.addEventListener('click', () => input.click());
-            zone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                zone.classList.add('dragover');
-            });
-            zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-            zone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                zone.classList.remove('dragover');
-                if (e.dataTransfer.files.length) {
-                    handler(e.dataTransfer.files[0], zone);
-                }
-            });
-            input.addEventListener('change', (e) => {
-                if (e.target.files.length) {
-                    handler(e.target.files[0], zone);
-                }
-            });
+        // Load saved families from localStorage
+        function loadFamilies() {
+            const saved = localStorage.getItem('renault_families');
+            if (saved) {
+                families = JSON.parse(saved);
+            }
         }
         
-        function handleCSV(file, zone) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                csvData = e.target.result;
-                csvFilename.textContent = file.name;
-                csvFilename.classList.remove('hidden');
-                zone.classList.add('has-file');
-                zone.querySelector('p:first-of-type').textContent = 'CSV geladen:';
-                parseAndAnalyze();
-            };
-            reader.readAsText(file);
+        function saveFamiliesToStorage() {
+            localStorage.setItem('renault_families', JSON.stringify(families));
         }
         
-        function handleConfig(file, zone) {
+        // Initialize
+        loadFamilies();
+        
+        // Page Navigation
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(page + 'Page').classList.add('active');
+            document.querySelector(`.nav-tab[onclick="showPage('${page}')"]`).classList.add('active');
+            
+            if (page === 'admin') {
+                renderFamiliesTable();
+            }
+        }
+        
+        // File Upload
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        
+        uploadSection.addEventListener('click', () => fileInput.click());
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+        uploadSection.addEventListener('dragleave', () => uploadSection.classList.remove('dragover'));
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        function handleFile(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                try {
-                    configData = jsyaml.load(e.target.result);
-                    configFilename.textContent = file.name;
-                    configFilename.classList.remove('hidden');
-                    zone.classList.add('has-file');
-                    zone.querySelector('p:first-of-type').textContent = 'Config geladen:';
-                    parseAndAnalyze();
-                } catch (err) {
-                    alert('Fehler beim Parsen der YAML-Datei: ' + err.message);
-                }
+                parseCSV(e.target.result);
+                document.getElementById('filename').textContent = file.name;
+                document.getElementById('filename').style.display = 'block';
+                uploadSection.classList.add('has-file');
+                uploadSection.querySelector('h2').textContent = 'Datei geladen';
+                uploadSection.querySelector('p').textContent = 'Klicken um andere Datei zu wählen';
             };
             reader.readAsText(file);
         }
         
         function parseCSV(text) {
             const lines = text.trim().split('\n');
-            const header = lines[0].split(';');
-            const rows = [];
+            parsedData = [];
+            articlesByFamily = {};
             
             for (let i = 1; i < lines.length; i++) {
                 const values = lines[i].split(';');
                 if (values.length >= 8) {
-                    rows.push({
+                    const row = {
                         article: values[0],
                         list_price: parseFloat(values[1]) || 0,
                         buying_price: parseFloat(values[2]) || 0,
@@ -418,187 +613,163 @@
                         description: values[6] || '',
                         weight: values[7] || '',
                         dlnr: values[8] || ''
-                    });
+                    };
+                    parsedData.push(row);
+                    
+                    // Create family key from discount values
+                    const familyKey = `${row.discount}_${row.discount_self}`;
+                    
+                    // Track articles per family
+                    if (!articlesByFamily[familyKey]) {
+                        articlesByFamily[familyKey] = [];
+                    }
+                    articlesByFamily[familyKey].push(row);
+                    
+                    // Add to families if not exists
+                    if (!families[familyKey]) {
+                        families[familyKey] = {
+                            code: familyKey,
+                            discountCustomer: row.discount,
+                            discountSelf: row.discount_self,
+                            description: guessDescription(row.description)
+                        };
+                    }
                 }
             }
-            return rows;
+            
+            saveFamiliesToStorage();
+            showResults();
         }
         
-        function findFamily(row, families) {
-            // Match family by discount values
-            for (const [key, family] of Object.entries(families)) {
-                const discCust = parseFloat(family.discountCustomer);
-                const discSelf = parseFloat(family.discountSelf);
-                
-                // Check if discounts match (with small tolerance for floating point)
-                if (Math.abs(row.discount - discCust) < 0.01 && 
-                    Math.abs(row.discount_self - discSelf) < 0.01) {
-                    return { key, family };
-                }
-            }
-            return null;
+        function guessDescription(desc) {
+            // Try to extract a meaningful category from description
+            const parts = desc.split(' ');
+            return parts[0] || 'Allgemein';
         }
         
-        function parseAndAnalyze() {
-            if (!csvData || !configData) return;
+        function showResults() {
+            document.getElementById('resultsSection').style.display = 'block';
             
-            parsedRows = parseCSV(csvData);
+            // Calculate stats
+            const total = parsedData.length;
+            const familyCount = Object.keys(articlesByFamily).length;
+            const totalValue = parsedData.reduce((sum, r) => sum + r.list_price, 0);
             
-            // Get all families from all outputs combined
-            const allFamilies = {};
-            for (const output of Object.values(configData.outputs || {})) {
-                Object.assign(allFamilies, output.families || {});
-            }
-            
-            // Count matches
-            let matched = 0;
-            let unmatched = 0;
-            const familyCounts = {};
-            
-            parsedRows.forEach(row => {
-                const match = findFamily(row, allFamilies);
-                if (match) {
-                    matched++;
-                    familyCounts[match.family.code] = (familyCounts[match.family.code] || 0) + 1;
-                } else {
-                    unmatched++;
-                }
-            });
-            
-            // Show stats
-            stats.innerHTML = `
-                <div class="stat">
-                    <div class="stat-value">${parsedRows.length}</div>
-                    <div class="stat-label">Artikel gesamt</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">${matched}</div>
-                    <div class="stat-label">Zugeordnet</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">${unmatched}</div>
-                    <div class="stat-label">Ohne Familie</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">${Object.keys(familyCounts).length}</div>
-                    <div class="stat-label">Familien aktiv</div>
-                </div>
-            `;
-            
-            statsCard.classList.remove('hidden');
-            
-            // Generate output buttons
-            renderOutputs();
+            document.getElementById('statTotal').textContent = total.toLocaleString('de-DE');
+            document.getElementById('statMatched').textContent = total.toLocaleString('de-DE');
+            document.getElementById('statFamilies').textContent = familyCount;
+            document.getElementById('statValue').textContent = Math.round(totalValue).toLocaleString('de-DE');
         }
         
-        function renderOutputs() {
-            const outputs = configData.outputs || {};
+        // Render Families Table
+        function renderFamiliesTable() {
+            const body = document.getElementById('familiesBody');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             
-            outputList.innerHTML = Object.entries(outputs).map(([key, output]) => {
-                const families = output.families || {};
-                const familyCount = Object.keys(families).length;
-                
-                // Count matching articles for this output
-                let matchCount = 0;
-                parsedRows.forEach(row => {
-                    if (findFamily(row, families)) matchCount++;
-                });
-                
-                return `
-                    <div class="output-item">
-                        <div class="output-info">
-                            <h3>${output.fileName || key + '.csv'}</h3>
-                            <p>Typ: ${output.type || 'default'} | ${familyCount} Familien | ${matchCount} Artikel</p>
-                        </div>
-                        <button class="btn btn-download" onclick="generateOutput('${key}')">
-                            Download
-                        </button>
+            const sortedFamilies = Object.entries(families)
+                .filter(([key, fam]) => {
+                    if (!searchTerm) return true;
+                    return key.includes(searchTerm) || 
+                           (fam.description && fam.description.toLowerCase().includes(searchTerm));
+                })
+                .sort((a, b) => (articlesByFamily[b[0]]?.length || 0) - (articlesByFamily[a[0]]?.length || 0));
+            
+            if (sortedFamilies.length === 0) {
+                body.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Keine Familien gefunden</h3>
+                        <p>Laden Sie eine CSV-Datei hoch oder ändern Sie den Suchbegriff.</p>
                     </div>
                 `;
-            }).join('');
-            
-            generateCard.classList.remove('hidden');
-        }
-        
-        // Toggle preview
-        document.getElementById('togglePreview').addEventListener('click', () => {
-            const previewEl = document.getElementById('preview');
-            const btn = document.getElementById('togglePreview');
-            
-            if (previewEl.classList.contains('hidden')) {
-                // Show preview (first 20 rows)
-                const previewRows = parsedRows.slice(0, 20);
-                previewEl.innerHTML = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Artikel</th>
-                                <th>Listenpreis</th>
-                                <th>EK-Preis</th>
-                                <th>Rabatt</th>
-                                <th>Beschreibung</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${previewRows.map(r => `
-                                <tr>
-                                    <td>${r.article}</td>
-                                    <td>${r.list_price.toFixed(2)}</td>
-                                    <td>${r.buying_price.toFixed(2)}</td>
-                                    <td>${r.discount}%</td>
-                                    <td>${r.description}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    <p style="color: #888; margin-top: 1rem; font-size: 0.85rem;">
-                        Zeige ${previewRows.length} von ${parsedRows.length} Artikeln
-                    </p>
-                `;
-                previewEl.classList.remove('hidden');
-                btn.textContent = 'Vorschau ausblenden';
-            } else {
-                previewEl.classList.add('hidden');
-                btn.textContent = 'Vorschau anzeigen';
-            }
-        });
-        
-        function generateOutput(outputKey) {
-            const output = configData.outputs[outputKey];
-            if (!output) return;
-            
-            const families = output.families || {};
-            const isExtended = output.type === 'extended';
-            const fileName = output.fileName || outputKey + '.csv';
-            
-            // Filter rows that match any family in this output
-            const matchedRows = parsedRows.filter(row => findFamily(row, families));
-            
-            if (matchedRows.length === 0) {
-                errorBox.textContent = `Keine Artikel gefunden für "${outputKey}". Prüfen Sie die Rabattwerte in der Config.`;
-                errorBox.classList.remove('hidden');
                 return;
             }
             
-            errorBox.classList.add('hidden');
-            
-            // Generate CSV
-            let csv = '';
-            
-            if (isExtended) {
-                csv = 'article;list_price;buying_price;buying_price_self;discount;discount_self;description;weight;DLNR\n';
-                matchedRows.forEach(row => {
-                    csv += `${row.article};${row.list_price.toFixed(2)};${row.buying_price.toFixed(2)};${row.buying_price_self.toFixed(2)};${row.discount};${row.discount_self};${row.description};${row.weight};${row.dlnr}\n`;
-                });
-            } else {
-                csv = 'article;list_price;buying_price\n';
-                matchedRows.forEach(row => {
-                    csv += `${row.article};${row.list_price.toFixed(2)};${row.buying_price.toFixed(2)}\n`;
-                });
+            body.innerHTML = sortedFamilies.map(([key, fam]) => `
+                <div class="table-row" data-key="${key}">
+                    <div class="family-code">${key.replace('_', ' / ')}</div>
+                    <div>
+                        <input type="text" class="discount-input" style="width:150px;text-align:left" 
+                               value="${fam.description || ''}" 
+                               onchange="updateFamily('${key}', 'description', this.value)"
+                               placeholder="Beschreibung">
+                    </div>
+                    <div>
+                        <input type="number" class="discount-input" step="0.01"
+                               value="${fam.discountCustomer}" 
+                               onchange="updateFamily('${key}', 'discountCustomer', parseFloat(this.value))">
+                    </div>
+                    <div>
+                        <input type="number" class="discount-input" step="0.01"
+                               value="${fam.discountSelf}" 
+                               onchange="updateFamily('${key}', 'discountSelf', parseFloat(this.value))">
+                    </div>
+                    <div class="article-count">${(articlesByFamily[key]?.length || 0).toLocaleString('de-DE')}</div>
+                </div>
+            `).join('');
+        }
+        
+        function filterFamilies() {
+            renderFamiliesTable();
+        }
+        
+        function updateFamily(key, field, value) {
+            if (families[key]) {
+                families[key][field] = value;
+            }
+        }
+        
+        function saveFamilies() {
+            saveFamiliesToStorage();
+            showToast('Änderungen gespeichert!');
+        }
+        
+        // Download Functions
+        function downloadCustomerList() {
+            if (parsedData.length === 0) {
+                showToast('Keine Daten geladen', true);
+                return;
             }
             
-            // Download
-            downloadFile(csv, fileName);
+            let csv = 'article;list_price;buying_price\n';
+            
+            parsedData.forEach(row => {
+                const familyKey = `${row.discount}_${row.discount_self}`;
+                const family = families[familyKey];
+                
+                // Use family discount or original
+                const discount = family ? family.discountCustomer : row.discount;
+                const buyingPrice = row.list_price * (1 - discount / 100);
+                
+                csv += `${row.article};${row.list_price.toFixed(2)};${buyingPrice.toFixed(2)}\n`;
+            });
+            
+            downloadFile(csv, 'Preisliste_Kunden.csv');
+            showToast('Kundenpreisliste heruntergeladen');
+        }
+        
+        function downloadFullList() {
+            if (parsedData.length === 0) {
+                showToast('Keine Daten geladen', true);
+                return;
+            }
+            
+            let csv = 'article;list_price;buying_price;buying_price_self;discount;discount_self;description;weight;DLNR\n';
+            
+            parsedData.forEach(row => {
+                const familyKey = `${row.discount}_${row.discount_self}`;
+                const family = families[familyKey];
+                
+                // Use family discounts or original
+                const discountCustomer = family ? family.discountCustomer : row.discount;
+                const discountSelf = family ? family.discountSelf : row.discount_self;
+                const buyingPrice = row.list_price * (1 - discountCustomer / 100);
+                const buyingPriceSelf = row.list_price * (1 - discountSelf / 100);
+                
+                csv += `${row.article};${row.list_price.toFixed(2)};${buyingPrice.toFixed(2)};${buyingPriceSelf.toFixed(2)};${discountCustomer};${discountSelf};${row.description};${row.weight};${row.dlnr}\n`;
+            });
+            
+            downloadFile(csv, 'Preisliste_CSS.csv');
+            showToast('CSS-Preisliste heruntergeladen');
         }
         
         function downloadFile(content, filename) {
@@ -611,6 +782,52 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        }
+        
+        // Config Export/Import
+        function exportConfig() {
+            const config = {
+                version: 1,
+                exported: new Date().toISOString(),
+                families: families
+            };
+            const json = JSON.stringify(config, null, 2);
+            downloadFile(json, 'renault_config.json');
+            showToast('Config exportiert');
+        }
+        
+        function importConfig() {
+            document.getElementById('configImport').click();
+        }
+        
+        function handleConfigImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const config = JSON.parse(e.target.result);
+                    if (config.families) {
+                        families = { ...families, ...config.families };
+                        saveFamiliesToStorage();
+                        renderFamiliesTable();
+                        showToast('Config importiert!');
+                    }
+                } catch (err) {
+                    showToast('Fehler beim Importieren', true);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Toast
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
     </script>
 </body>
