@@ -585,31 +585,51 @@
         function handleFile(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                parseCSV(e.target.result);
-                document.getElementById('filename').textContent = file.name;
-                document.getElementById('filename').style.display = 'block';
-                uploadSection.classList.add('has-file');
-                uploadSection.querySelector('h2').textContent = 'Datei geladen';
-                uploadSection.querySelector('p').textContent = 'Klicken um andere Datei zu wählen';
+                const result = parseCSV(e.target.result);
+                if (result.success) {
+                    document.getElementById('filename').textContent = file.name;
+                    document.getElementById('filename').style.display = 'block';
+                    uploadSection.classList.add('has-file');
+                    uploadSection.querySelector('h2').textContent = 'Datei geladen';
+                    uploadSection.querySelector('p').textContent = 'Klicken um andere Datei zu wählen';
+                    showToast(`${result.count} Artikel geladen`);
+                } else {
+                    showToast(result.error, true);
+                }
             };
             reader.readAsText(file);
         }
         
         function parseCSV(text) {
             const lines = text.trim().split('\n');
+            if (lines.length < 2) {
+                return { success: false, error: 'Datei ist leer oder hat nur Header' };
+            }
+            
+            // Detect separator (semicolon or comma)
+            const firstLine = lines[0];
+            const separator = firstLine.includes(';') ? ';' : ',';
+            
+            // Check column count
+            const headerCols = firstLine.split(separator).length;
+            console.log('CSV Info:', { lines: lines.length, separator, headerCols, header: firstLine });
+            
             parsedData = [];
             articlesByFamily = {};
+            let skipped = 0;
             
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(';');
-                if (values.length >= 8) {
+                const values = lines[i].split(separator);
+                
+                // Flexible: mindestens 3 Spalten (Artikel, Preis, irgendwas)
+                if (values.length >= 3) {
                     const row = {
-                        article: values[0],
-                        list_price: parseFloat(values[1]) || 0,
-                        buying_price: parseFloat(values[2]) || 0,
-                        buying_price_self: parseFloat(values[3]) || 0,
-                        discount: parseFloat(values[4]) || 0,
-                        discount_self: parseFloat(values[5]) || 0,
+                        article: values[0] || '',
+                        list_price: parseFloat(values[1]?.replace(',', '.')) || 0,
+                        buying_price: parseFloat(values[2]?.replace(',', '.')) || 0,
+                        buying_price_self: parseFloat(values[3]?.replace(',', '.')) || 0,
+                        discount: parseFloat(values[4]?.replace(',', '.')) || 0,
+                        discount_self: parseFloat(values[5]?.replace(',', '.')) || 0,
                         description: values[6] || '',
                         weight: values[7] || '',
                         dlnr: values[8] || ''
@@ -634,11 +654,18 @@
                             description: guessDescription(row.description)
                         };
                     }
+                } else {
+                    skipped++;
                 }
+            }
+            
+            if (parsedData.length === 0) {
+                return { success: false, error: `Keine gültigen Zeilen gefunden (${headerCols} Spalten erkannt, Trennzeichen: "${separator}")` };
             }
             
             saveFamiliesToStorage();
             showResults();
+            return { success: true, count: parsedData.length, skipped };
         }
         
         function guessDescription(desc) {
