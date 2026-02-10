@@ -813,12 +813,17 @@
                         saveFamiliesToStorage();
                         renderFamiliesTable();
                         showToast('Config importiert!');
+                    } else {
+                        showToast('Keine Familien in der Datei gefunden', true);
                     }
                 } catch (err) {
-                    showToast('Fehler beim Importieren', true);
+                    showToast('Fehler beim Importieren: ' + err.message, true);
                 }
             };
             reader.readAsText(file);
+            
+            // Reset input so same file can be imported again
+            event.target.value = '';
         }
         
         // Toast
